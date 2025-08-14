@@ -38,3 +38,120 @@
 | `ssh -C username@host` | Enables compression for faster transfers over slow connections. |
 
 ---
+
+## SSH Configuration File (`~/.ssh/config`)
+
+The `~/.ssh/config` file allows you to define shortcuts and customize SSH behavior for different hosts.
+
+### **Basic Syntax**
+```ssh-config
+Host <alias>
+    HostName <real_hostname_or_ip>
+    User <username>
+    Port <port_number>
+    IdentityFile <path_to_private_key>
+```
+
+**Example:**
+```ssh-config
+Host myserver
+    HostName 192.168.1.10
+    User admin
+    Port 2222
+    IdentityFile ~/.ssh/id_rsa
+```
+Now you can connect with:
+```bash
+ssh myserver
+```
+
+---
+
+### **Common `.ssh/config` Options**
+
+| Option | Description |
+|--------|-------------|
+| `Host` | Alias name for the connection. Can also be a pattern (e.g., `*.example.com`). |
+| `HostName` | Actual hostname or IP address of the server. |
+| `User` | Default username for the connection. |
+| `Port` | SSH port (default: 22). |
+| `IdentityFile` | Path to the private key file. |
+| `ProxyJump` | Jump/bastion host for connecting to another server. |
+| `ForwardAgent` | Enables SSH agent forwarding (`yes`/`no`). |
+| `Compression` | Enables compression (`yes`/`no`). |
+| `ServerAliveInterval` | Time (in seconds) between keep-alive messages. |
+| `ServerAliveCountMax` | Number of unanswered keep-alives before disconnecting. |
+| `StrictHostKeyChecking` | Controls host key verification (`yes`, `no`, `ask`). |
+| `UserKnownHostsFile` | Specifies file to store known hosts (default: `~/.ssh/known_hosts`). |
+| `LocalForward` | Local port forwarding (`local_port remote_host:remote_port`). |
+| `RemoteForward` | Remote port forwarding (`remote_port local_host:local_port`). |
+| `DynamicForward` | Dynamic port forwarding (SOCKS proxy). |
+| `ControlMaster` | Enables connection sharing (`yes`, `no`, `auto`). |
+| `ControlPath` | Path to the control socket for connection sharing. |
+| `ControlPersist` | Keeps the master connection open (`yes`, `no`, or time in seconds). |
+| `LogLevel` | Verbosity of SSH logs (`QUIET`, `ERROR`, `INFO`, `VERBOSE`, etc.). |
+
+---
+
+### **Advanced Examples**
+
+**1. Multiple Aliases for Same Server**
+```ssh-config
+Host web1 webserver prod-web
+    HostName 203.0.113.10
+    User ubuntu
+    IdentityFile ~/.ssh/prod_key
+```
+
+**2. Using a Jump Host**
+```ssh-config
+Host target
+    HostName 10.0.0.5
+    User ec2-user
+    ProxyJump bastion
+```
+
+**3. Per-Host Keep-Alive and Compression**
+```ssh-config
+Host database
+    HostName db.example.com
+    User dbadmin
+    Compression yes
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+```
+
+**4. Port Forwarding via Config**
+```ssh-config
+Host tunnel
+    HostName mydb.example.com
+    User admin
+    LocalForward 3306 localhost:3306
+```
+
+**5. Wildcard Configurations**
+```ssh-config
+Host *.dev.example.com
+    User developer
+    IdentityFile ~/.ssh/dev_key
+```
+
+**6. Disable Host Key Checking (use with caution!)**
+```ssh-config
+Host testserver
+    HostName 192.168.10.5
+    User root
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+```
+
+---
+
+### **Tips**
+- Permissions: `chmod 600 ~/.ssh/config` (required for security).
+- Use comments (`#`) to document entries.
+- You can have multiple `Host` blocks in the same file.
+- Order matters: The first matching `Host` entry is used.
+- Patterns like `?` and `*` are supported for multiple hosts.
+
+---
